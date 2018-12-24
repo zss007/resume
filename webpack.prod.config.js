@@ -1,13 +1,15 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const EndWebpackPlugin = require('end-webpack-plugin')
+const puppeteer = require('puppeteer')
 const ghpages = require('gh-pages')
 
 const path = require('path')
 const fs = require('fs')
-const { exec, spawnSync } = require('child_process')
+const { exec } = require('child_process')
 
-const outputPath = path.resolve(__dirname, '.public')
+const config = require('./config')
+const outputPath = path.resolve(__dirname, config.output)
 
 function ghPagesPromise() {
   return new Promise((resolve, reject) => {
@@ -82,17 +84,29 @@ module.exports = {
     }),
     new EndWebpackPlugin(async () => {
       // 自定义域名
-      fs.writeFileSync(path.resolve(outputPath, 'CNAME'), 'resume.master-ss.cn')
+      fs.writeFileSync(path.resolve(outputPath, 'CNAME'), config.url)
 
+      // 静态资源发布
       await ghPagesPromise()
 
-      // 调用 Chrome 渲染出 PDF 文件
-      // const chromePath = findChrome()
-      // spawnSync(chromePath, ['--headless', '--disable-gpu', `--print-to-pdf=${path.resolve(outputPath, 'resume.pdf')}`,
-      //   'http://resume.master-ss.cn' // 这里注意改成你的在线简历的网站
-      // ])
+      const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+      const page = await browser.newPage()
+      await page.goto(`http://${config.url}`)
+      page.waitFor(2000)
 
-      // await ghPagesPromise()
+      // 网页快照
+      await page.pdf({
+        path: `${config.output}/resume.pdf`,
+        printBackground: true,
+        displayHeaderFooter: false,
+        format: 'A4',
+      })
+
+      // 关闭浏览器
+      await browser.close()
+
+      // 静态资源发布
+      await ghPagesPromise()
 
       exec(`rm -rf ${outputPath}`)
     }),

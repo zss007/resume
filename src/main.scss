@@ -80,6 +80,11 @@ a {
     margin: 0;
     @include border-radius(0);
   }
+  svg {
+    @media print {
+      fill: #000;
+    }
+  }
 }
 
 .content-hd {
