@@ -117,6 +117,9 @@ a {
       width: 100%;
       margin: 0;
       border-radius: 0; } }
+  @media print {
+    .content svg {
+      fill: #000; } }
 
 .content-hd {
   width: 100%;
