@@ -5,7 +5,8 @@
   "main": "./src/index.js",
   "scripts": {
     "dev": "webpack-dev-server --inline --config webpack.dev.config.js --mode development",
-    "build": "NODE_ENV=production webpack --config webpack.prod.config.js --mode production"
+    "build": "rm -rf .public && NODE_ENV=production webpack --config webpack.prod.config.js --mode production",
+    "pub": "node publish.js"
   },
   "keywords": [],
   "author": "",
