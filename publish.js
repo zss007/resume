@@ -22,7 +22,7 @@ function ghPagesPromise() {
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
   const page = await browser.newPage()
   await page.goto(`http://${config.url}`)
-  page.waitFor(2000)
+  await page.waitFor(2000)
 
   // 网页快照
   await page.pdf({
